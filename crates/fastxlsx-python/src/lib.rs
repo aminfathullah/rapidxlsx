@@ -1,108 +1,11 @@
 use pyo3::buffer::PyBuffer;
+use pyo3::exceptions::{PyIOError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyBool, PyBytes, PyFloat, PyInt, PyList, PySequence, PyString, PyTuple};
 
-use crate::xml::{write_bool_cell, write_float_cell, write_int_cell, write_string_cell};
+use fastxlsx_core::{write_xlsx_file, ColumnData};
 
-pub enum ColumnData {
-    Int64(Vec<i64>),
-    Int64Opt(Vec<Option<i64>>),
-    Int32(Vec<i32>),
-    Float64(Vec<f64>),
-    Float64Opt(Vec<Option<f64>>),
-    Float32(Vec<f32>),
-    Bool(Vec<bool>),
-    BoolOpt(Vec<Option<bool>>),
-    StringDense(Vec<String>),
-    StringOpt(Vec<Option<String>>),
-    Empty(usize),
-}
-
-impl ColumnData {
-    #[inline(always)]
-    pub fn len(&self) -> usize {
-        match self {
-            Self::Int64(v) => v.len(),
-            Self::Int64Opt(v) => v.len(),
-            Self::Int32(v) => v.len(),
-            Self::Float64(v) => v.len(),
-            Self::Float64Opt(v) => v.len(),
-            Self::Float32(v) => v.len(),
-            Self::Bool(v) => v.len(),
-            Self::BoolOpt(v) => v.len(),
-            Self::StringDense(v) => v.len(),
-            Self::StringOpt(v) => v.len(),
-            Self::Empty(len) => *len,
-        }
-    }
-
-    #[inline(always)]
-    pub fn write_cell(
-        &self,
-        row_idx: usize,
-        excel_row: u32,
-        col_idx: usize,
-        buf: &mut Vec<u8>,
-        itoa_buf: &mut itoa::Buffer,
-        ryu_buf: &mut ryu::Buffer,
-    ) {
-        match self {
-            Self::Int64(v) => {
-                if let Some(&val) = v.get(row_idx) {
-                    write_int_cell(buf, col_idx, excel_row, val, itoa_buf);
-                }
-            }
-            Self::Int64Opt(v) => {
-                if let Some(Some(val)) = v.get(row_idx) {
-                    write_int_cell(buf, col_idx, excel_row, *val, itoa_buf);
-                }
-            }
-            Self::Int32(v) => {
-                if let Some(&val) = v.get(row_idx) {
-                    write_int_cell(buf, col_idx, excel_row, val as i64, itoa_buf);
-                }
-            }
-            Self::Float64(v) => {
-                if let Some(&val) = v.get(row_idx) {
-                    write_float_cell(buf, col_idx, excel_row, val, itoa_buf, ryu_buf);
-                }
-            }
-            Self::Float64Opt(v) => {
-                if let Some(Some(val)) = v.get(row_idx) {
-                    write_float_cell(buf, col_idx, excel_row, *val, itoa_buf, ryu_buf);
-                }
-            }
-            Self::Float32(v) => {
-                if let Some(&val) = v.get(row_idx) {
-                    write_float_cell(buf, col_idx, excel_row, val as f64, itoa_buf, ryu_buf);
-                }
-            }
-            Self::Bool(v) => {
-                if let Some(&val) = v.get(row_idx) {
-                    write_bool_cell(buf, col_idx, excel_row, val, itoa_buf);
-                }
-            }
-            Self::BoolOpt(v) => {
-                if let Some(Some(val)) = v.get(row_idx) {
-                    write_bool_cell(buf, col_idx, excel_row, *val, itoa_buf);
-                }
-            }
-            Self::StringDense(v) => {
-                if let Some(s) = v.get(row_idx) {
-                    write_string_cell(buf, col_idx, excel_row, s, itoa_buf);
-                }
-            }
-            Self::StringOpt(v) => {
-                if let Some(Some(s)) = v.get(row_idx) {
-                    write_string_cell(buf, col_idx, excel_row, s, itoa_buf);
-                }
-            }
-            Self::Empty(_) => {}
-        }
-    }
-}
-
-pub fn extract_column<'py>(obj: &Bound<'py, PyAny>) -> PyResult<ColumnData> {
+fn extract_column<'py>(obj: &Bound<'py, PyAny>) -> PyResult<ColumnData<'static>> {
     let py = obj.py();
 
     if let Ok(tuple) = obj.downcast::<PyTuple>() {
@@ -219,7 +122,7 @@ pub fn extract_column<'py>(obj: &Bound<'py, PyAny>) -> PyResult<ColumnData> {
     Ok(ColumnData::Empty(0))
 }
 
-fn extract_tagged_column<'py>(tag: &str, val: &Bound<'py, PyAny>) -> PyResult<ColumnData> {
+fn extract_tagged_column<'py>(tag: &str, val: &Bound<'py, PyAny>) -> PyResult<ColumnData<'static>> {
     match tag {
         "f64" => {
             if let Ok(bytes) = val.downcast::<PyBytes>() {
@@ -317,7 +220,7 @@ fn extract_masked_column<'py>(
     tag: &str,
     val: &Bound<'py, PyAny>,
     mask: &Bound<'py, PyAny>,
-) -> PyResult<ColumnData> {
+) -> PyResult<ColumnData<'static>> {
     let mask_bytes = mask.downcast::<PyBytes>()?.as_bytes();
     match tag {
         "f64" => {
@@ -374,7 +277,7 @@ fn extract_masked_column<'py>(
     }
 }
 
-fn extract_from_list(list: &Bound<'_, PyList>) -> PyResult<ColumnData> {
+fn extract_from_list(list: &Bound<'_, PyList>) -> PyResult<ColumnData<'static>> {
     let len = list.len();
     if len == 0 {
         return Ok(ColumnData::Empty(0));
@@ -466,4 +369,37 @@ fn extract_from_list(list: &Bound<'_, PyList>) -> PyResult<ColumnData> {
         return Ok(ColumnData::StringDense(dense));
     }
     Ok(ColumnData::StringOpt(res_opt))
+}
+
+#[pyfunction]
+#[pyo3(signature = (path, sheet_name, headers, columns, compression_level = 1))]
+fn write_xlsx(
+    py: Python<'_>,
+    path: String,
+    sheet_name: String,
+    headers: Vec<String>,
+    columns: &Bound<'_, PyList>,
+    compression_level: u32,
+) -> PyResult<()> {
+    let mut cols_data: Vec<ColumnData<'static>> = Vec::with_capacity(columns.len());
+    for item in columns.iter() {
+        let col = extract_column(&item)?;
+        cols_data.push(col);
+    }
+
+    py.allow_threads(|| {
+        write_xlsx_file(&path, &sheet_name, &headers, &cols_data, compression_level)
+            .map_err(|e| match e.kind() {
+                std::io::ErrorKind::InvalidInput => PyValueError::new_err(e.to_string()),
+                _ => PyIOError::new_err(e.to_string()),
+            })
+    })?;
+
+    Ok(())
+}
+
+#[pymodule]
+fn _fastxlsx(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(write_xlsx, m)?)?;
+    Ok(())
 }

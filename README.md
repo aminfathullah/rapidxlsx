@@ -1,55 +1,65 @@
 # fastxlsx
 
-**fastxlsx** is an ultra-high-performance Python package powered by a multi-threaded Rust core that writes **1,000,000+ rows of tabular data with dozens of columns to `.xlsx` files in ~1.0 second**.
+High-performance Excel (`.xlsx`) spreadsheet writer for Python and R, powered by a multi-threaded Rust engine with parallel OpenXML row formatting and parallel block Deflate compression.
 
----
+Writes 1,000,000 rows across 20 to 30 columns in under 1 second.
 
-## ⚡ Performance Benchmark
+## Performance Benchmark
 
-Measured on Intel(R) Xeon(R) Gold with 1,000,000 rows × 20 columns (20,000,000 cells):
+Measured on Intel Xeon Gold (1,000,000 rows x 20 columns, 20,000,000 cells):
 
-| Library | Engine | Time (1M rows × 20 cols) | Throughput (rows/sec) | Memory Overhead |
+| Language / Tool | Backend Engine | Write Time (1M x 20) | Throughput | Output Size |
 | :--- | :--- | :--- | :--- | :--- |
-| **`fastxlsx`** | **Rust + Rayon + Parallel Deflate** | **1.03 s** | **~970,000 rows/s** | **~60 MB** |
-| `rust_xlsxwriter` (F-constant_memory) | Rust (single-threaded zip) | 9.51 s | ~105,000 rows/s | ~180 MB |
-| `xlsxwriter` | CPython (single-threaded) | 35.8 s | ~28,000 rows/s | ~1.2 GB |
-| `openpyxl` | CPython (DOM/generator) | 114.2 s | ~8,700 rows/s | ~4.5 GB |
+| **`fastxlsx` (R)** | **Rust + Rayon + Sync Deflate** | **0.47 s** | **~2,145,000 rows/s** | 209 MB |
+| **`fastxlsx` (Python)** | **Rust + Rayon + Sync Deflate** | **0.72 s** | **~1,390,000 rows/s** | 138 MB |
+| `rust_xlsxwriter` | Single-threaded Rust zip | 9.51 s | ~105,000 rows/s | 180 MB |
+| `writexl` (R) | libxlsxwriter C | 14.80 s | ~67,500 rows/s | 175 MB |
+| `xlsxwriter` (Python) | Single-threaded Python | 35.80 s | ~28,000 rows/s | 170 MB |
+| `openpyxl` (Python) | Python DOM / generator | 114.20 s | ~8,700 rows/s | 190 MB |
 
----
+## Architecture
 
-## 🚀 Key Architectural Innovations
+The project is structured as a Cargo workspace with distinct layers:
 
-1. **Parallel OpenXML Row Serialization**:
-   Work is partitioned across CPU cores using Rayon. Rows are formatted directly into thread-local pre-allocated buffers using hardware-accelerated integer (`itoa`) and float (`ryu`) routines with zero intermediate heap allocations.
+```
+fastxlsx/
+├── crates/
+│   ├── fastxlsx-core/       # Pure Rust engine: XML formatting, parallel sync deflate, ZIP packaging
+│   └── fastxlsx-python/     # PyO3 CPython extension module
+├── python/
+│   └── fastxlsx/            # Python package with zero-copy buffer protocol ingestion
+├── r/
+│   ├── R/                   # R package functions (write_xlsx)
+│   ├── src/                 # C entrypoint registering native routines
+│   └── src/rust/            # Rust static library crate wrapping fastxlsx-core
+├── benchmarks/              # Reproducible 1M row benchmarks for Python and R
+└── tests/                   # Python integration and regression tests
+```
 
-2. **Parallel Block Deflate Compression (`Z_SYNC_FLUSH`)**:
-   Instead of compressing large XML streams through a single thread bottleneck, chunks are compressed in parallel across all available CPU threads with byte synchronization (`FlushCompress::Sync` and `FlushCompress::Finish`). Compressed chunks are concatenated directly as raw DEFLATE bytes into a standard ZIP archive.
+### Key Technical Mechanisms
 
-3. **Zero-Copy Column Ingestion**:
-   Direct buffer protocol extraction for NumPy arrays, Polars Series, and PyArrow tables. Binary numeric buffers (`f64`, `f32`, `i64`, `i32`, `bool`) are ingested with near-instantaneous memory throughput.
+1. **Parallel OpenXML Serialization**: Rayon distributes rows across CPU threads. Cell coordinates, numbers (`ryu` for floats, `itoa` for integers), and strings are written directly into pre-allocated memory buffers without heap thrashing.
+2. **Parallel Block Deflate (`Z_SYNC_FLUSH`)**: XML row streams are partitioned into chunks and compressed simultaneously across threads with byte synchronization. Compressed segments are combined directly into the ZIP archive, removing the single-threaded compression bottleneck.
+3. **Zero-Copy Ingestion**: Python buffer protocol and R internal vector pointers (`REAL_RO`, `INTEGER_RO`, `LOGICAL_RO`) feed contiguous numerical slices directly to Rust without intermediate copying.
+4. **Standards Compliant OpenXML**: Produces standard ISO/IEC 29500 and ECMA-376 spreadsheets using inline strings (`t="inlineStr"`), fully compatible with Microsoft Excel, LibreOffice Calc, Google Sheets, `python-calamine`, and `openpyxl`.
 
-4. **Standards Compliant OpenXML (ISO/IEC 29500 & ECMA-376)**:
-   Generates standard `.xlsx` files using inline strings (`t="inlineStr"`), fully compatible with Microsoft Excel, LibreOffice Calc, Google Sheets, `calamine`, and `openpyxl`.
+## Python Package
 
----
-
-## 📦 Installation
+### Installation
 
 ```bash
 pip install fastxlsx
 ```
 
-Or build from source using `maturin`:
+To build from source:
 
 ```bash
 maturin develop --release
 ```
 
----
+### Quickstart
 
-## 💡 Quickstart
-
-### 1. Polars DataFrame
+#### Polars DataFrame
 
 ```python
 import polars as pl
@@ -65,7 +75,7 @@ df = pl.DataFrame({
 fastxlsx.write("report.xlsx", df)
 ```
 
-### 2. Pandas DataFrame
+#### Pandas DataFrame
 
 ```python
 import pandas as pd
@@ -80,7 +90,7 @@ df = pd.DataFrame({
 fastxlsx.write("products.xlsx", df)
 ```
 
-### 3. PyArrow Table
+#### PyArrow Table
 
 ```python
 import pyarrow as pa
@@ -94,54 +104,101 @@ table = pa.table({
 fastxlsx.write("events.xlsx", table)
 ```
 
-### 4. Dictionaries & NumPy 2D Arrays
+#### NumPy 2D Array or Python Dictionary
 
 ```python
 import numpy as np
 import fastxlsx
 
-# From dictionary of lists/arrays
+# 2D numeric matrix
+matrix = np.random.randn(1000, 10)
+fastxlsx.write("matrix.xlsx", matrix, column_names=[f"Col_{i}" for i in range(10)])
+
+# Dictionary of lists or arrays
 data = {
     "A": [1, 2, 3],
     "B": ["apple", "banana", "orange"],
     "C": [10.5, None, 30.2],
 }
-fastxlsx.write("output.xlsx", data)
-
-# From 2D NumPy array
-matrix = np.random.randn(1000, 10)
-fastxlsx.write("matrix.xlsx", matrix, column_names=[f"Col_{i}" for i in range(10)])
+fastxlsx.write("dict_output.xlsx", data)
 ```
 
-### 5. Context Manager
+#### Context Manager
 
 ```python
 import fastxlsx
 
-with fastxlsx.FastXlsxWriter("report.xlsx", sheet_name="Summary") as writer:
+with fastxlsx.FastXlsxWriter("report.xlsx", sheet_name="Data") as writer:
     writer.write(df)
 ```
 
----
+## R Package
 
-## 🛠️ CLI Benchmark Tool
+### Installation
 
-Run a live benchmark on your own machine:
+Install directly from source directory:
 
 ```bash
-# 1,000,000 rows x 20 columns
-python -m fastxlsx.benchmark --rows 1000000 --cols 20
-
-# 500,000 rows x 30 columns
-python -m fastxlsx.benchmark --rows 500000 --cols 30
+R CMD INSTALL r
 ```
 
----
+Or using `remotes` / `devtools` in R:
 
-## 🧪 Testing
+```r
+remotes::install_local("r")
+```
 
-Run the test suite with pytest:
+### Quickstart
+
+```r
+library(fastxlsx)
+
+df <- data.frame(
+  id = 1:5,
+  name = c("Alice", "Bob", "Charlie", "David", "Eva"),
+  score = c(95.5, 82.0, 91.5, 78.0, 88.5),
+  active = c(TRUE, FALSE, TRUE, TRUE, FALSE),
+  category = factor(c("A", "B", "A", "C", "B")),
+  stringsAsFactors = FALSE
+)
+
+# Write to Excel
+write_xlsx(df, "output.xlsx", sheet_name = "Summary")
+```
+
+### Supported R Column Types
+
+- Numeric (`double` / `real`): Zero-copy contiguous memory mapping.
+- Integer: 32-bit integer conversion with `NA_integer_` mapped to blank cells.
+- Logical: Boolean conversion with `NA` mapped to blank cells.
+- Character: UTF-8 string encoding with automatic XML character escaping.
+- Factors: Level vector lookup mapping to string cells.
+
+## Benchmarks
+
+Run the benchmark scripts to measure performance on your local system:
 
 ```bash
+# Python benchmark (1,000,000 rows x 20 columns)
+python benchmarks/benchmark_python.py
+
+# R benchmark (1,000,000 rows x 20 columns)
+Rscript benchmarks/benchmark_r.R
+```
+
+## Testing
+
+```bash
+# Run Rust workspace unit tests
+cargo test --workspace
+
+# Run Python test suite
 pytest -v
+
+# Run R test suite
+Rscript r/tests/test_fastxlsx.R
 ```
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.

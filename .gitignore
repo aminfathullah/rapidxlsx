@@ -1,72 +1,43 @@
-/target
+# Rust build artifacts
+target/
+**/target/
+Cargo.lock
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-.pytest_cache/
-*.py[cod]
-
-# C extensions
+# C / C++ compiled objects & libraries
+*.o
+*.a
 *.so
+*.dylib
+*.dll
 
-# Distribution / packaging
-.Python
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
 .venv/
 env/
-bin/
-build/
-develop-eggs/
-dist/
-eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-include/
-man/
 venv/
-*.egg-info/
-.installed.cfg
-*.egg
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-pip-selfcheck.json
+# R package artifacts
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rcheck/
+r/src/*.o
+r/src/*.so
+r/src/*.dll
+r/src/rust/target/
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.cache
-nosetests.xml
-coverage.xml
-
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-
-# Rope
-.ropeproject
-
-# Django stuff:
-*.log
-*.pot
-
+# IDE & OS files
 .DS_Store
-
-# Sphinx documentation
-docs/_build/
-
-# PyCharm
 .idea/
-
-# VSCode
 .vscode/
-
-# Pyenv
-.python-version
+*.swp
+*.swo

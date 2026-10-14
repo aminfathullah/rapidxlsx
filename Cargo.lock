@@ -71,16 +71,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e9c71c2167ca323c882b99918929403426e2373ea17242ff5653e0d5e1058be"
 
 [[package]]
-name = "fastxlsx"
+name = "fastxlsx-core"
 version = "0.1.0"
 dependencies = [
  "crc32fast",
  "flate2",
  "itoa",
  "libdeflater",
- "pyo3",
  "rayon",
  "ryu",
+]
+
+[[package]]
+name = "fastxlsx-python"
+version = "0.1.0"
+dependencies = [
+ "fastxlsx-core",
+ "pyo3",
+]
+
+[[package]]
+name = "fastxlsx-r"
+version = "0.1.0"
+dependencies = [
+ "fastxlsx-core",
 ]
 
 [[package]]

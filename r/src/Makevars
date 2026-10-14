@@ -1,0 +1,19 @@
+CARGO ?= cargo
+TARGET_DIR = rust/target
+LIBDIR = $(TARGET_DIR)/release
+STATLIB = $(LIBDIR)/libfastxlsx_r.a
+
+PKG_LIBS = -L$(LIBDIR) -lfastxlsx_r -lpthread -ldl
+
+all: $(SHLIB)
+
+$(SHLIB): $(STATLIB)
+
+$(STATLIB):
+	@mkdir -p $(TARGET_DIR)
+	CARGO_TARGET_DIR=$(TARGET_DIR) $(CARGO) build --release --manifest-path=rust/Cargo.toml
+
+.PHONY: all clean $(STATLIB)
+
+clean:
+	rm -rf $(TARGET_DIR)

@@ -1,0 +1,11 @@
+Package: fastxlsx
+Type: Package
+Title: Fast Parallel Excel Spreadsheet Writer
+Version: 0.1.0
+Authors@R: person("FastXLSX", "Authors", role = c("aut", "cre"), email = "authors@fastxlsx.org")
+Description: High-performance parallel engine for writing tabular datasets to Excel XLSX files. Powered by a multi-threaded Rust core with parallel Deflate compression and zero-copy columnar ingestion.
+License: MIT + file LICENSE
+Encoding: UTF-8
+RoxygenNote: 7.3.2
+SystemRequirements: Cargo (Rust toolchain)
+NeedsCompilation: yes

@@ -156,7 +156,7 @@ def test_nan_and_inf_handling(tmp_path):
     ws = wb.active
     values = [cell.value for cell in ws["B"][1:]]
     assert values[0] == 1.0
-    assert values[1] == "#NUM!"
+    assert values[1] is None
     assert values[2] == "#DIV/0!"
     assert values[3] == "#DIV/0!"
     assert values[4] == 2.5

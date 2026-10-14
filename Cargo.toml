@@ -1,20 +1,10 @@
-[package]
-name = "fastxlsx"
-version = "0.1.0"
-edition = "2024"
-
-[lib]
-name = "_fastxlsx"
-crate-type = ["cdylib"]
-
-[dependencies]
-pyo3 = { version = "0.23", features = ["extension-module", "abi3-py311"] }
-rayon = "1.10"
-libdeflater = "1.23"
-crc32fast = "1.4"
-itoa = "1.0"
-ryu = "1.0"
-flate2 = "1.0"
+[workspace]
+resolver = "2"
+members = [
+    "crates/fastxlsx-core",
+    "crates/fastxlsx-python",
+    "r/src/rust",
+]
 
 [profile.release]
 opt-level = 3
