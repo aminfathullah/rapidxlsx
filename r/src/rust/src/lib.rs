@@ -1,7 +1,7 @@
 #![allow(unsafe_op_in_unsafe_fn)]
 
 use std::ffi::{c_char, c_int, c_void, CStr};
-use fastxlsx_core::{write_xlsx_file, ColumnData};
+use rapidxlsx_core::{write_xlsx_file, ColumnData};
 
 type SEXP = *mut c_void;
 
@@ -147,7 +147,7 @@ pub unsafe extern "C" fn c_write_xlsx(
     };
 
     if let Err(e) = write_xlsx_file(path_str, sheet_str, &headers, &columns, comp_level) {
-        let err_msg = format!("fastxlsx write error: {}\0", e);
+        let err_msg = format!("rapidxlsx write error: {}\0", e);
         Rf_error(b"%s\0".as_ptr() as *const c_char, err_msg.as_ptr() as *const c_char);
     }
 

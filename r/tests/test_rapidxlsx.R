@@ -1,4 +1,4 @@
-library(fastxlsx)
+library(rapidxlsx)
 
 test_file <- tempfile(fileext = ".xlsx")
 

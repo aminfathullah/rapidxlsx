@@ -1,9 +1,9 @@
 CARGO ?= cargo
 TARGET_DIR = rust/target
 LIBDIR = $(TARGET_DIR)/release
-STATLIB = $(LIBDIR)/libfastxlsx_r.a
+STATLIB = $(LIBDIR)/librapidxlsx_r.a
 
-PKG_LIBS = -L$(LIBDIR) -lfastxlsx_r -lws2_32 -luserenv -lbcrypt -lntdll
+PKG_LIBS = -L$(LIBDIR) -lrapidxlsx_r -lws2_32 -luserenv -lbcrypt -lntdll
 
 all: $(SHLIB)
 

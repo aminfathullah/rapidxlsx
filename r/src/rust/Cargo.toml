@@ -1,11 +1,12 @@
 [package]
-name = "fastxlsx-r"
+name = "rapidxlsx-r"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "fastxlsx_r"
+name = "rapidxlsx_r"
 crate-type = ["staticlib"]
 
 [dependencies]
-fastxlsx-core = { path = "../../../crates/fastxlsx-core" }
+rapidxlsx-core = { path = "../../../crates/rapidxlsx-core" }
+

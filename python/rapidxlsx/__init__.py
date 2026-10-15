@@ -3,9 +3,9 @@ from __future__ import annotations
 import os
 from typing import Any, Mapping, Sequence
 
-from fastxlsx._fastxlsx import write_xlsx
+from rapidxlsx._rapidxlsx import write_xlsx
 
-__all__ = ["write", "FastXlsxWriter"]
+__all__ = ["write", "RapidXlsxWriter"]
 
 
 def _process_numpy_column(arr: Any) -> tuple[str, Any] | tuple[str, Any, Any] | list[Any]:
@@ -184,7 +184,7 @@ def _normalize_data(data: Any, column_names: Sequence[str] | None = None) -> tup
             ]
             return headers, columns
 
-    raise TypeError(f"Unsupported data type for fastxlsx: {type(data)}")
+    raise TypeError(f"Unsupported data type for rapidxlsx: {type(data)}")
 
 
 def write(
@@ -205,7 +205,7 @@ def write(
     )
 
 
-class FastXlsxWriter:
+class RapidXlsxWriter:
     def __init__(
         self,
         path: str | os.PathLike[str],
@@ -216,7 +216,7 @@ class FastXlsxWriter:
         self.sheet_name = sheet_name
         self.compression_level = compression_level
 
-    def __enter__(self) -> FastXlsxWriter:
+    def __enter__(self) -> RapidXlsxWriter:
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -230,3 +230,4 @@ class FastXlsxWriter:
             column_names=column_names,
             compression_level=self.compression_level,
         )
+

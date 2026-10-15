@@ -3,7 +3,7 @@ requires = ["maturin>=1.15,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "fastxlsx"
+name = "rapidxlsx"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Rust",
@@ -17,8 +17,8 @@ tests = [
 ]
 [tool.maturin]
 python-source = "python"
-module-name = "fastxlsx._fastxlsx"
-manifest-path = "crates/fastxlsx-python/Cargo.toml"
+module-name = "rapidxlsx._rapidxlsx"
+manifest-path = "crates/rapidxlsx-python/Cargo.toml"
 exclude = [
     "**/__pycache__",
     "**/*.pyc",

@@ -1,4 +1,4 @@
-library(fastxlsx)
+library(rapidxlsx)
 
 num_rows <- 1000000L
 num_cols <- 20L
@@ -19,7 +19,7 @@ cat(sprintf("Data generation: %.3f s\n", (proc.time() - t0)["elapsed"]))
 out_path <- tempfile(fileext = ".xlsx")
 
 tryCatch({
-  cat("Writing XLSX using fastxlsx::write_xlsx()...\n")
+  cat("Writing XLSX using rapidxlsx::write_xlsx()...\n")
   t_start <- proc.time()
   write_xlsx(df, out_path, sheet_name = "Benchmark")
   t_elapsed <- (proc.time() - t_start)["elapsed"]

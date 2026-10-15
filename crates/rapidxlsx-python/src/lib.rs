@@ -3,7 +3,7 @@ use pyo3::exceptions::{PyIOError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyBool, PyBytes, PyFloat, PyInt, PyList, PySequence, PyString, PyTuple};
 
-use fastxlsx_core::{write_xlsx_file, ColumnData};
+use rapidxlsx_core::{write_xlsx_file, ColumnData};
 
 fn extract_column<'py>(obj: &Bound<'py, PyAny>) -> PyResult<ColumnData<'static>> {
     let py = obj.py();
@@ -399,7 +399,7 @@ fn write_xlsx(
 }
 
 #[pymodule]
-fn _fastxlsx(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn _rapidxlsx(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(write_xlsx, m)?)?;
     Ok(())
 }

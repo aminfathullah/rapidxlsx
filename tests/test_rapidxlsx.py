@@ -8,7 +8,7 @@ import pandas as pd
 import pyarrow as pa
 import pytest
 
-import fastxlsx
+import rapidxlsx
 
 
 def test_basic_dict(tmp_path):
@@ -19,7 +19,7 @@ def test_basic_dict(tmp_path):
         "C": [1.1, 2.2, 3.3],
         "D": [True, False, True],
     }
-    fastxlsx.write(out, data)
+    rapidxlsx.write(out, data)
 
     res = pl.read_excel(out, engine="calamine")
     assert res.shape == (3, 4)
@@ -38,7 +38,7 @@ def test_polars_dataframe(tmp_path):
         "score": [98.5, None, 75.0],
         "passed": [True, False, True],
     })
-    fastxlsx.write(out, df)
+    rapidxlsx.write(out, df)
 
     res = pl.read_excel(out, engine="calamine")
     assert res.shape == (3, 4)
@@ -55,7 +55,7 @@ def test_pandas_dataframe(tmp_path):
         "y": ["alpha", "beta", "gamma"],
         "z": [0.5, 1.5, 2.5],
     })
-    fastxlsx.write(out, df)
+    rapidxlsx.write(out, df)
 
     res = pl.read_excel(out, engine="calamine")
     assert res.shape == (3, 3)
@@ -70,7 +70,7 @@ def test_pyarrow_table(tmp_path):
         "col_a": [1, 2, 3, 4],
         "col_b": ["w", "x", "y", "z"],
     })
-    fastxlsx.write(out, table)
+    rapidxlsx.write(out, table)
 
     res = pl.read_excel(out, engine="calamine")
     assert res.shape == (4, 2)
@@ -81,7 +81,7 @@ def test_pyarrow_table(tmp_path):
 def test_numpy_2d(tmp_path):
     out = str(tmp_path / "numpy.xlsx")
     arr = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=np.float64)
-    fastxlsx.write(out, arr, column_names=["First", "Second"])
+    rapidxlsx.write(out, arr, column_names=["First", "Second"])
 
     res = pl.read_excel(out, engine="calamine")
     assert res.shape == (3, 2)
@@ -96,7 +96,7 @@ def test_list_of_lists(tmp_path):
         [1, "apple", True],
         [2, "banana", False],
     ]
-    fastxlsx.write(out, data, column_names=["ID", "Fruit", "Available"])
+    rapidxlsx.write(out, data, column_names=["ID", "Fruit", "Available"])
 
     res = pl.read_excel(out, engine="calamine")
     assert res.shape == (2, 3)
@@ -111,7 +111,7 @@ def test_list_of_dicts(tmp_path):
         {"city": "Paris", "pop": 2161000},
         {"city": "Tokyo", "pop": 13960000},
     ]
-    fastxlsx.write(out, data)
+    rapidxlsx.write(out, data)
 
     res = pl.read_excel(out, engine="calamine")
     assert res.shape == (2, 2)
@@ -130,7 +130,7 @@ def test_xml_escaping(tmp_path):
         "  leading & trailing  ",
         "Control \x01\x02 characters \x1f stripped",
     ]
-    fastxlsx.write(out, {"Text": tricky_strings})
+    rapidxlsx.write(out, {"Text": tricky_strings})
 
     res = pl.read_excel(out, engine="calamine")
     read_vals = res["Text"].to_list()
@@ -149,7 +149,7 @@ def test_nan_and_inf_handling(tmp_path):
         "id": [1, 2, 3, 4, 5],
         "Floats": [1.0, float("nan"), float("inf"), float("-inf"), 2.5],
     }
-    fastxlsx.write(out, data)
+    rapidxlsx.write(out, data)
 
     import openpyxl
     wb = openpyxl.load_workbook(out)
@@ -164,7 +164,7 @@ def test_nan_and_inf_handling(tmp_path):
 
 def test_context_manager(tmp_path):
     out = str(tmp_path / "context.xlsx")
-    with fastxlsx.FastXlsxWriter(out, sheet_name="DataSheet") as writer:
+    with rapidxlsx.RapidXlsxWriter(out, sheet_name="DataSheet") as writer:
         writer.write({"Col1": [10, 20]})
 
     res = pl.read_excel(out, sheet_name="DataSheet", engine="calamine")
@@ -175,18 +175,18 @@ def test_context_manager(tmp_path):
 def test_excel_limits(tmp_path):
     out = str(tmp_path / "limits.xlsx")
     with pytest.raises(Exception):
-        fastxlsx.write(out, {"Col": [0] * 1_048_576})
+        rapidxlsx.write(out, {"Col": [0] * 1_048_576})
 
 
 def test_unsupported_type(tmp_path):
     out = str(tmp_path / "err.xlsx")
     with pytest.raises(TypeError):
-        fastxlsx.write(out, 12345)
+        rapidxlsx.write(out, 12345)
 
 
 def test_zip_integrity(tmp_path):
     out = str(tmp_path / "integrity.xlsx")
-    fastxlsx.write(out, {"A": list(range(1000))})
+    rapidxlsx.write(out, {"A": list(range(1000))})
     ret = subprocess.run(["unzip", "-t", out], capture_output=True, text=True)
     assert ret.returncode == 0
 
@@ -199,6 +199,6 @@ def test_scale_100k(tmp_path):
         "float_col": np.random.randn(n),
         "bool_col": np.arange(n) % 2 == 0,
     })
-    fastxlsx.write(out, df)
+    rapidxlsx.write(out, df)
     res = pl.read_excel(out, engine="calamine")
     assert res.shape == (n, 3)

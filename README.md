@@ -1,4 +1,4 @@
-# fastxlsx
+# rapidxlsx
 
 High-performance Excel (`.xlsx`) spreadsheet writer for Python and R, powered by a multi-threaded Rust engine with parallel OpenXML row formatting and parallel block Deflate compression.
 
@@ -10,8 +10,8 @@ Measured on Intel Xeon Gold (1,000,000 rows x 20 columns, 20,000,000 cells):
 
 | Language / Tool | Backend Engine | Write Time (1M x 20) | Throughput | Output Size |
 | :--- | :--- | :--- | :--- | :--- |
-| **`fastxlsx` (R)** | **Rust + Rayon + Sync Deflate** | **0.47 s** | **~2,145,000 rows/s** | 209 MB |
-| **`fastxlsx` (Python)** | **Rust + Rayon + Sync Deflate** | **0.72 s** | **~1,390,000 rows/s** | 138 MB |
+| **`rapidxlsx` (R)** | **Rust + Rayon + Sync Deflate** | **0.46 s** | **~2,178,000 rows/s** | 209 MB |
+| **`rapidxlsx` (Python)** | **Rust + Rayon + Sync Deflate** | **0.78 s** | **~1,270,000 rows/s** | 138 MB |
 | `rust_xlsxwriter` | Single-threaded Rust zip | 9.51 s | ~105,000 rows/s | 180 MB |
 | `writexl` (R) | libxlsxwriter C | 14.80 s | ~67,500 rows/s | 175 MB |
 | `xlsxwriter` (Python) | Single-threaded Python | 35.80 s | ~28,000 rows/s | 170 MB |
@@ -22,18 +22,18 @@ Measured on Intel Xeon Gold (1,000,000 rows x 20 columns, 20,000,000 cells):
 The project is structured as a Cargo workspace with distinct layers:
 
 ```
-fastxlsx/
+rapidxlsx/
 ├── crates/
-│   ├── fastxlsx-core/       # Pure Rust engine: XML formatting, parallel sync deflate, ZIP packaging
-│   └── fastxlsx-python/     # PyO3 CPython extension module
+│   ├── rapidxlsx-core/       # Pure Rust engine: XML formatting, parallel sync deflate, ZIP packaging
+│   └── rapidxlsx-python/     # PyO3 CPython extension module
 ├── python/
-│   └── fastxlsx/            # Python package with zero-copy buffer protocol ingestion
+│   └── rapidxlsx/            # Python package with zero-copy buffer protocol ingestion
 ├── r/
-│   ├── R/                   # R package functions (write_xlsx)
-│   ├── src/                 # C entrypoint registering native routines
-│   └── src/rust/            # Rust static library crate wrapping fastxlsx-core
-├── benchmarks/              # Reproducible 1M row benchmarks for Python and R
-└── tests/                   # Python integration and regression tests
+│   ├── R/                    # R package functions (write_xlsx)
+│   ├── src/                  # C entrypoint registering native routines
+│   └── src/rust/             # Rust static library crate wrapping rapidxlsx-core
+├── benchmarks/               # Reproducible 1M row benchmarks for Python and R
+└── tests/                    # Python integration and regression tests
 ```
 
 ### Key Technical Mechanisms
@@ -48,7 +48,7 @@ fastxlsx/
 ### Installation
 
 ```bash
-pip install fastxlsx
+pip install rapidxlsx
 ```
 
 To build from source:
@@ -63,7 +63,7 @@ maturin develop --release
 
 ```python
 import polars as pl
-import fastxlsx
+import rapidxlsx
 
 df = pl.DataFrame({
     "id": [1, 2, 3],
@@ -72,14 +72,14 @@ df = pl.DataFrame({
     "active": [True, False, True],
 })
 
-fastxlsx.write("report.xlsx", df)
+rapidxlsx.write("report.xlsx", df)
 ```
 
 #### Pandas DataFrame
 
 ```python
 import pandas as pd
-import fastxlsx
+import rapidxlsx
 
 df = pd.DataFrame({
     "product_id": [101, 102, 103],
@@ -87,32 +87,32 @@ df = pd.DataFrame({
     "category": ["Electronics", "Books", "Home"],
 })
 
-fastxlsx.write("products.xlsx", df)
+rapidxlsx.write("products.xlsx", df)
 ```
 
 #### PyArrow Table
 
 ```python
 import pyarrow as pa
-import fastxlsx
+import rapidxlsx
 
 table = pa.table({
     "event_id": [1001, 1002, 1003],
     "value": [1.23, 4.56, 7.89],
 })
 
-fastxlsx.write("events.xlsx", table)
+rapidxlsx.write("events.xlsx", table)
 ```
 
 #### NumPy 2D Array or Python Dictionary
 
 ```python
 import numpy as np
-import fastxlsx
+import rapidxlsx
 
 # 2D numeric matrix
 matrix = np.random.randn(1000, 10)
-fastxlsx.write("matrix.xlsx", matrix, column_names=[f"Col_{i}" for i in range(10)])
+rapidxlsx.write("matrix.xlsx", matrix, column_names=[f"Col_{i}" for i in range(10)])
 
 # Dictionary of lists or arrays
 data = {
@@ -120,15 +120,15 @@ data = {
     "B": ["apple", "banana", "orange"],
     "C": [10.5, None, 30.2],
 }
-fastxlsx.write("dict_output.xlsx", data)
+rapidxlsx.write("dict_output.xlsx", data)
 ```
 
 #### Context Manager
 
 ```python
-import fastxlsx
+import rapidxlsx
 
-with fastxlsx.FastXlsxWriter("report.xlsx", sheet_name="Data") as writer:
+with rapidxlsx.RapidXlsxWriter("report.xlsx", sheet_name="Data") as writer:
     writer.write(df)
 ```
 
@@ -151,7 +151,7 @@ remotes::install_local("r")
 ### Quickstart
 
 ```r
-library(fastxlsx)
+library(rapidxlsx)
 
 df <- data.frame(
   id = 1:5,
@@ -196,7 +196,7 @@ cargo test --workspace
 pytest -v
 
 # Run R test suite
-Rscript r/tests/test_fastxlsx.R
+Rscript r/tests/test_rapidxlsx.R
 ```
 
 ## License

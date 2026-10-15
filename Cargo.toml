@@ -1,8 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/fastxlsx-core",
-    "crates/fastxlsx-python",
+    "crates/rapidxlsx-core",
+    "crates/rapidxlsx-python",
     "r/src/rust",
 ]
 

@@ -2,7 +2,7 @@ import os
 import time
 import tempfile
 import polars as pl
-import fastxlsx
+import rapidxlsx
 
 def run_benchmark(num_rows: int = 1_000_000, num_cols: int = 20):
     print(f"Generating dataset: {num_rows:,} rows x {num_cols} columns...")
@@ -20,9 +20,9 @@ def run_benchmark(num_rows: int = 1_000_000, num_cols: int = 20):
         out_path = f.name
 
     try:
-        print(f"Writing to {out_path} using fastxlsx.write()...")
+        print(f"Writing to {out_path} using rapidxlsx.write()...")
         t_start = time.perf_counter()
-        fastxlsx.write(out_path, df)
+        rapidxlsx.write(out_path, df)
         t_elapsed = time.perf_counter() - t_start
 
         file_size_mb = os.path.getsize(out_path) / (1024 * 1024)

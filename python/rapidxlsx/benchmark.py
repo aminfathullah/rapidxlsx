@@ -8,7 +8,7 @@ import time
 import numpy as np
 import polars as pl
 
-import fastxlsx
+import rapidxlsx
 
 
 def run_benchmark(
@@ -18,7 +18,7 @@ def run_benchmark(
     output_path: str = "benchmark_output.xlsx",
 ) -> None:
     print("=" * 70)
-    print(f"FASTXLSX BENCHMARK: {num_rows:,} rows x {num_cols} columns ({num_rows * num_cols:,} cells)")
+    print(f"RAPIDXLSX BENCHMARK: {num_rows:,} rows x {num_cols} columns ({num_rows * num_cols:,} cells)")
     print("=" * 70)
 
     print("Generating dataset...")
@@ -40,9 +40,9 @@ def run_benchmark(
     gen_time = time.perf_counter() - t0
     print(f"Dataset generated in {gen_time:.2f}s (DataFrame shape: {df.shape})")
 
-    print("\nRunning fastxlsx...")
+    print("\nRunning rapidxlsx...")
     t_start = time.perf_counter()
-    fastxlsx.write(output_path, df)
+    rapidxlsx.write(output_path, df)
     fast_time = time.perf_counter() - t_start
 
     file_size_bytes = os.path.getsize(output_path)
@@ -51,7 +51,7 @@ def run_benchmark(
     cells_per_sec = (num_rows * num_cols) / fast_time
     throughput_mb_sec = file_size_mb / fast_time
 
-    print(f"fastxlsx completed in : {fast_time:.3f} seconds")
+    print(f"rapidxlsx completed in: {fast_time:.3f} seconds")
     print(f"Generated file size   : {file_size_mb:.2f} MB")
     print(f"Throughput (rows/sec) : {rows_per_sec:,.0f} rows/s")
     print(f"Throughput (cells/sec): {cells_per_sec:,.0f} cells/s")
@@ -76,7 +76,7 @@ def run_benchmark(
         opx_time = time.perf_counter() - t_opx_start
         print(f"openpyxl ({sample_rows:,} rows) took: {opx_time:.3f} seconds")
         speedup = (opx_time / sample_rows) / (fast_time / num_rows)
-        print(f"fastxlsx speedup vs openpyxl: {speedup:.1f}x faster")
+        print(f"rapidxlsx speedup vs openpyxl: {speedup:.1f}x faster")
         if os.path.exists("openpyxl_temp.xlsx"):
             os.remove("openpyxl_temp.xlsx")
 
@@ -89,7 +89,7 @@ def run_benchmark(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="fastxlsx Performance Benchmark")
+    parser = argparse.ArgumentParser(description="rapidxlsx Performance Benchmark")
     parser.add_argument("--rows", type=int, default=1_000_000, help="Number of rows")
     parser.add_argument("--cols", type=int, default=20, help="Number of columns")
     parser.add_argument("--compare-openpyxl", action="store_true", help="Compare with openpyxl")

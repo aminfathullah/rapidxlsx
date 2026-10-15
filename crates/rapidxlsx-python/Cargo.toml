@@ -1,12 +1,13 @@
 [package]
-name = "fastxlsx-python"
+name = "rapidxlsx-python"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "_fastxlsx"
+name = "_rapidxlsx"
 crate-type = ["cdylib"]
 
 [dependencies]
-fastxlsx-core = { path = "../fastxlsx-core" }
+rapidxlsx-core = { path = "../rapidxlsx-core" }
 pyo3 = { version = "0.23", features = ["extension-module", "abi3-py311"] }
+
