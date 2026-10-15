@@ -41,3 +41,13 @@ r/src/rust/target/
 .vscode/
 *.swp
 *.swo
+
+# LaTeX / Paper build artifacts
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+

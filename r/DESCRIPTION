@@ -2,7 +2,7 @@ Package: rapidxlsx
 Type: Package
 Title: Fast Parallel Excel Spreadsheet Writer
 Version: 0.1.0
-Authors@R: person("RapidXLSX", "Authors", role = c("aut", "cre"), email = "authors@rapidxlsx.org")
+Authors@R: person("Amin", "Fathullah", role = c("aut", "cre"), email = "amin_fathullah@yahoo.com")
 Description: High-performance parallel engine for writing tabular datasets to Excel XLSX files. Powered by a multi-threaded Rust core with parallel Deflate compression and zero-copy columnar ingestion.
 License: MIT + file LICENSE
 Encoding: UTF-8
