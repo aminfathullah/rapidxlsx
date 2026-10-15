@@ -51,3 +51,4 @@ paper/*.blg
 paper/*.fls
 paper/*.fdb_latexmk
 
+.env
