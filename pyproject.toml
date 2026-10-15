@@ -28,6 +28,9 @@ tests = [
 python-source = "python"
 module-name = "rapidxlsx._rapidxlsx"
 manifest-path = "crates/rapidxlsx-python/Cargo.toml"
+include = [
+    { path = "LICENSE", format = "sdist" },
+]
 exclude = [
     "**/__pycache__",
     "**/*.pyc",

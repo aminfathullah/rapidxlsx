@@ -2,6 +2,10 @@
 name = "rapidxlsx-python"
 version = "0.1.0"
 edition = "2024"
+description = "PyO3 bindings for rapidxlsx high-performance spreadsheet engine"
+license = "MIT"
+repository = "https://github.com/aminfathullah/rapidxlsx"
+authors = ["Amin Fathullah <amin_fathullah@yahoo.com>"]
 
 [lib]
 name = "_rapidxlsx"

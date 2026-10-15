@@ -5,7 +5,8 @@ from typing import Any, Mapping, Sequence
 
 from rapidxlsx._rapidxlsx import write_xlsx
 
-__all__ = ["write", "RapidXlsxWriter"]
+__version__ = "0.1.0"
+__all__ = ["write", "RapidXlsxWriter", "__version__"]
 
 
 def _process_numpy_column(arr: Any) -> tuple[str, Any] | tuple[str, Any, Any] | list[Any]:

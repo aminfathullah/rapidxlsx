@@ -2,6 +2,10 @@
 name = "rapidxlsx-core"
 version = "0.1.0"
 edition = "2024"
+description = "Core high-performance parallel Excel spreadsheet serializer"
+license = "MIT"
+repository = "https://github.com/aminfathullah/rapidxlsx"
+authors = ["Amin Fathullah <amin_fathullah@yahoo.com>"]
 
 [dependencies]
 rayon = "1.10"
