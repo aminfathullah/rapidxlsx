@@ -11,10 +11,15 @@ $(SHLIB): $(STATLIB)
 
 $(STATLIB):
 	rustc --version
+	@if [ -f rust/vendor.tar.xz ] && [ ! -d rust/vendor ]; then \
+		tar -xf rust/vendor.tar.xz -C rust; \
+	fi
+	@mkdir -p rust/.cargo
+	@cp -f rust/vendor-config.toml rust/.cargo/config.toml
 	@mkdir -p $(TARGET_DIR)
-	CARGO_TARGET_DIR=$(TARGET_DIR) $(CARGO) build --release --manifest-path=rust/Cargo.toml
+	CARGO_TARGET_DIR=$(TARGET_DIR) $(CARGO) build --offline --release --manifest-path=rust/Cargo.toml
 
 .PHONY: all clean $(STATLIB)
 
 clean:
-	rm -rf $(TARGET_DIR)
+	rm -rf $(TARGET_DIR) rust/vendor rust/.cargo/config.toml

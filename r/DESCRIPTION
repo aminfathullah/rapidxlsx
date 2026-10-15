@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: person("Amin", "Fathullah", role = c("aut", "cre"), email = "amin_fathullah@yahoo.com")
 Author: Amin Fathullah [aut, cre]
 Maintainer: Amin Fathullah <amin_fathullah@yahoo.com>
-Description: Serializes tabular data frames to Microsoft Excel OpenXML ('xlsx') workbooks using a multi-threaded Rust core with parallel Deflate compression and zero-copy columnar memory mapping.
+Description: Serializes tabular data frames to Microsoft Excel 'OpenXML' ('xlsx') workbooks using a multi-threaded Rust core with parallel Deflate compression and zero-copy columnar memory mapping.
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.2

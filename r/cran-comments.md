@@ -1,13 +1,14 @@
 ## Test environments
 * local Ubuntu 24.04 LTS (x86_64), R 4.5.3
+* win-builder (devel and release)
+* Debian Linux (r-devel)
 
 ## R CMD check results
 
 0 ERRORs | 0 WARNINGs | 1 NOTE
 
-* Found the following (possibly) invalid URLs:
-  URL: https://github.com/aminfathullah/rapidxlsx
-  This is a new submission; the repository and issues will be public upon release.
+* Maintainer: 'Amin Fathullah <amin_fathullah@yahoo.com>'
+  New submission.
 
-* Found 'abort' in compiled code:
-  The package is backed by Rust. The 'abort' entry point originates from the standard Rust runtime library panic handlers and cannot be reached during normal execution, as all serialization is wrapped in std::panic::catch_unwind.
+* Offline compilation:
+  All Rust crate dependencies are bundled offline in src/rust/vendor.tar.xz and unpacked during package installation, strictly adhering to CRAN policy prohibiting network access during build and install.

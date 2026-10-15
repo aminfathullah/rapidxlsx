@@ -37,6 +37,8 @@ r/src/*.o
 r/src/*.so
 r/src/*.dll
 r/src/rust/target/
+r/src/rust/vendor/
+r/src/rust/.cargo/
 
 # IDE & OS files
 .DS_Store
