@@ -3,9 +3,17 @@ Type: Package
 Title: Fast Parallel Excel Spreadsheet Writer
 Version: 0.1.0
 Authors@R: person("Amin", "Fathullah", role = c("aut", "cre"), email = "amin_fathullah@yahoo.com")
-Description: High-performance parallel engine for writing tabular datasets to Excel XLSX files. Powered by a multi-threaded Rust core with parallel Deflate compression and zero-copy columnar ingestion.
+Author: Amin Fathullah [aut, cre]
+Maintainer: Amin Fathullah <amin_fathullah@yahoo.com>
+Description: Serializes tabular data frames to Microsoft Excel OpenXML ('xlsx') workbooks using a multi-threaded Rust core with parallel Deflate compression and zero-copy columnar memory mapping.
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 SystemRequirements: Cargo (Rust toolchain)
+URL: https://github.com/aminfathullah/rapidxlsx
+BugReports: https://github.com/aminfathullah/rapidxlsx/issues
 NeedsCompilation: yes
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

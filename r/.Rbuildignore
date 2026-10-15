@@ -1,0 +1,7 @@
+^src/rust/target$
+^src/rust/\.cargo$
+^src/rust/Cargo\.lock$
+^\.git$
+^\.github$
+^rapidxlsx_.*\.tar\.gz$
+^cran-comments\.md$

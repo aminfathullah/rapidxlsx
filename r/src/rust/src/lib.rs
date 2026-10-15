@@ -1,7 +1,13 @@
 #![allow(unsafe_op_in_unsafe_fn)]
 
+pub mod columns;
+pub mod writer;
+pub mod xml;
+pub mod zip;
+
+use columns::ColumnData;
 use std::ffi::{c_char, c_int, c_void, CStr};
-use rapidxlsx_core::{write_xlsx_file, ColumnData};
+use writer::write_xlsx_file;
 
 type SEXP = *mut c_void;
 
@@ -146,10 +152,19 @@ pub unsafe extern "C" fn c_write_xlsx(
         1
     };
 
-    if let Err(e) = write_xlsx_file(path_str, sheet_str, &headers, &columns, comp_level) {
-        let err_msg = format!("rapidxlsx write error: {}\0", e);
-        Rf_error(b"%s\0".as_ptr() as *const c_char, err_msg.as_ptr() as *const c_char);
-    }
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        write_xlsx_file(path_str, sheet_str, &headers, &columns, comp_level)
+    }));
 
-    R_NilValue
+    match result {
+        Ok(Ok(())) => R_NilValue,
+        Ok(Err(e)) => {
+            let err_msg = format!("rapidxlsx write error: {}\0", e);
+            Rf_error(b"%s\0".as_ptr() as *const c_char, err_msg.as_ptr() as *const c_char);
+        }
+        Err(_) => {
+            let err_msg = b"rapidxlsx panic during serialization\0";
+            Rf_error(b"%s\0".as_ptr() as *const c_char, err_msg.as_ptr() as *const c_char);
+        }
+    }
 }

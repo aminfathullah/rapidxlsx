@@ -10,6 +10,7 @@ all: $(SHLIB)
 $(SHLIB): $(STATLIB)
 
 $(STATLIB):
+	rustc --version
 	@mkdir -p $(TARGET_DIR)
 	CARGO_TARGET_DIR=$(TARGET_DIR) $(CARGO) build --release --manifest-path=rust/Cargo.toml
 

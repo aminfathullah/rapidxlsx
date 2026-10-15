@@ -268,7 +268,12 @@ dependencies = [
 name = "rapidxlsx-r"
 version = "0.1.0"
 dependencies = [
- "rapidxlsx-core",
+ "crc32fast",
+ "flate2",
+ "itoa",
+ "libdeflater",
+ "rayon",
+ "ryu",
 ]
 
 [[package]]
