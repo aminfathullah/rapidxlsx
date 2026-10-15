@@ -30,6 +30,7 @@ uv.lock
 .Rproj.user/
 .Rhistory
 .RData
+.Renviron
 .Ruserdata
 *.Rcheck/
 r/src/*.o
