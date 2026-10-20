@@ -6,16 +6,16 @@ Writes 1,000,000 rows across 20 to 30 columns in under 1 second.
 
 ## Performance Benchmark
 
-Measured on Intel Xeon Gold (1,000,000 rows x 20 columns, 20,000,000 cells):
+Measured on Intel Xeon Gold 6526Y (32 cores, 1,000,000 rows x 20 columns, 20,000,000 cells):
 
 | Language / Tool | Backend Engine | Write Time (1M x 20) | Throughput | Output Size |
 | :--- | :--- | :--- | :--- | :--- |
-| **`rapidxlsx` (R)** | **Rust + Rayon + Sync Deflate** | **0.46 s** | **~2,178,000 rows/s** | 209 MB |
-| **`rapidxlsx` (Python)** | **Rust + Rayon + Sync Deflate** | **0.78 s** | **~1,270,000 rows/s** | 138 MB |
-| `rust_xlsxwriter` | Single-threaded Rust zip | 9.51 s | ~105,000 rows/s | 180 MB |
-| `writexl` (R) | libxlsxwriter C | 14.80 s | ~67,500 rows/s | 175 MB |
-| `xlsxwriter` (Python) | Single-threaded Python | 35.80 s | ~28,000 rows/s | 170 MB |
-| `openpyxl` (Python) | Python DOM / generator | 114.20 s | ~8,700 rows/s | 190 MB |
+| **`rapidxlsx` (R)** | **Rust + Rayon + Sync Deflate** | **0.47 s** | **~2,100,000 rows/s** | 209 MB |
+| **`rapidxlsx` (Python)** | **Rust + Rayon + Sync Deflate** | **0.73 s** | **~1,370,000 rows/s** | 138 MB |
+| `rust_xlsxwriter` | Rust (`Workbook::new`) | 17.06 s | ~58,600 rows/s | 116 MB |
+| `writexl` (R) | libxlsxwriter C | 32.44 s | ~30,800 rows/s | 138 MB |
+| `xlsxwriter` (Python) | Python (`constant_memory`) | 64.55 s | ~15,500 rows/s | 111 MB |
+| `openpyxl` (Python) | Standard DOM generator | 111.58 s | ~8,960 rows/s | 107 MB |
 
 ## Architecture
 
@@ -136,16 +136,41 @@ with rapidxlsx.RapidXlsxWriter("report.xlsx", sheet_name="Data") as writer:
 
 ### Installation
 
-Install directly from source directory:
+#### Option 1: Pre-compiled Binaries (Recommended, No Rust or C toolchain required)
+
+Install pre-compiled platform binaries directly from GitHub Releases:
+
+```r
+# Windows (.zip)
+install.packages("https://github.com/aminfathullah/rapidxlsx/releases/download/v0.1.0/rapidxlsx_0.1.0.zip", repos = NULL)
+
+# macOS (.tgz)
+install.packages("https://github.com/aminfathullah/rapidxlsx/releases/download/v0.1.0/rapidxlsx_0.1.0.tgz", repos = NULL)
+
+# Linux (.tar.gz)
+install.packages("https://github.com/aminfathullah/rapidxlsx/releases/download/v0.1.0/rapidxlsx_0.1.0_linux.tar.gz", repos = NULL)
+
+# Or via remotes / devtools:
+remotes::install_url("https://github.com/aminfathullah/rapidxlsx/releases/download/v0.1.0/rapidxlsx_0.1.0.zip")
+```
+
+#### Option 2: R-universe (Automatic Cloud Binaries)
+
+```r
+install.packages("rapidxlsx", repos = c("https://aminfathullah.r-universe.dev", "https://cloud.r-project.org"))
+```
+
+#### Option 3: Install from Source (Requires Rust/Cargo toolchain)
+
+```r
+# From GitHub using remotes / devtools
+remotes::install_github("aminfathullah/rapidxlsx/r")
+```
+
+Or from local source directory:
 
 ```bash
 R CMD INSTALL r
-```
-
-Or using `remotes` / `devtools` in R:
-
-```r
-remotes::install_local("r")
 ```
 
 ### Quickstart
@@ -176,14 +201,14 @@ write_xlsx(df, "output.xlsx", sheet_name = "Summary")
 
 ## Benchmarks
 
-Run the benchmark scripts to measure performance on your local system:
+Run the benchmark scripts to measure and compare performance on your local system:
 
 ```bash
-# Python benchmark (1,000,000 rows x 20 columns)
-python benchmarks/benchmark_python.py
+# Python benchmark (rapidxlsx vs xlsxwriter vs openpyxl)
+python benchmarks/benchmark_python.py --compare
 
-# R benchmark (1,000,000 rows x 20 columns)
-Rscript benchmarks/benchmark_r.R
+# R benchmark (rapidxlsx vs writexl)
+Rscript benchmarks/benchmark_r.R --compare
 ```
 
 ## Testing

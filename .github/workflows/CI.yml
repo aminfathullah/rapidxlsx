@@ -194,24 +194,93 @@ jobs:
           name: wheels-sdist
           path: dist
 
+  r-binary-linux:
+    name: R Binary (Linux)
+    needs: [test-rust, test-python, test-r]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+      - name: Build R source package
+        run: R CMD build r
+      - name: Build R Linux binary
+        run: R CMD INSTALL --build r
+      - name: Stage R Linux artifacts
+        run: |
+          mkdir -p r-dist
+          cp -f rapidxlsx_*.tar.gz r-dist/
+      - name: Upload R Linux binaries
+        uses: actions/upload-artifact@v6
+        with:
+          name: r-binaries-linux
+          path: r-dist
+
+  r-binary-windows:
+    name: R Binary (Windows)
+    needs: [test-rust, test-python, test-r]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+      - name: Build R Windows binary
+        shell: bash
+        run: R CMD INSTALL --build r
+      - name: Stage R Windows artifacts
+        shell: bash
+        run: |
+          mkdir -p r-dist
+          cp -f rapidxlsx_*.zip r-dist/
+      - name: Upload R Windows binaries
+        uses: actions/upload-artifact@v6
+        with:
+          name: r-binaries-windows
+          path: r-dist
+
+  r-binary-macos:
+    name: R Binary (macOS)
+    needs: [test-rust, test-python, test-r]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+      - name: Build R macOS binary
+        run: R CMD INSTALL --build r
+      - name: Stage R macOS artifacts
+        run: |
+          mkdir -p r-dist
+          cp -f rapidxlsx_*.tgz r-dist/
+      - name: Upload R macOS binaries
+        uses: actions/upload-artifact@v6
+        with:
+          name: r-binaries-macos
+          path: r-dist
+
   release:
     name: Release
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
-    needs: [linux, musllinux, windows, macos, sdist]
+    needs: [linux, musllinux, windows, macos, sdist, r-binary-linux, r-binary-windows, r-binary-macos]
     permissions:
-      # Use to sign the release artifacts
       id-token: write
-      # Used to upload release artifacts
       contents: write
-      # Used to generate artifact attestation
       attestations: write
     steps:
       - uses: actions/download-artifact@v7
       - name: Generate artifact attestation
         uses: actions/attest@v4
         with:
-          subject-path: 'wheels-*/*'
+          subject-path: |
+            wheels-*/*
+            r-binaries-*/*
       - name: Install uv
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: astral-sh/setup-uv@v7
@@ -220,3 +289,15 @@ jobs:
         run: uv publish 'wheels-*/*'
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+      - name: Publish GitHub Release
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            wheels-*/*
+            r-binaries-*/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

@@ -265,18 +265,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rapidxlsx-r"
-version = "0.1.0"
-dependencies = [
- "crc32fast",
- "flate2",
- "itoa",
- "libdeflater",
- "rayon",
- "ryu",
-]
-
-[[package]]
 name = "rayon"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
