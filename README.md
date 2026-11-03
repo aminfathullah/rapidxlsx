@@ -1,5 +1,12 @@
 # rapidxlsx
 
+[![CRAN Version](https://www.r-pkg.org/badges/version/rapidxlsx)](https://cran.r-project.org/package=rapidxlsx)
+[![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/rapidxlsx)](https://cran.r-project.org/package=rapidxlsx)
+[![PyPI Version](https://img.shields.io/pypi/v/rapidxlsx.svg)](https://pypi.org/project/rapidxlsx/)
+[![Python Version](https://img.shields.io/badge/python-%3E%3D3.8-blue.svg)](https://pypi.org/project/rapidxlsx/)
+[![CI](https://github.com/aminfathullah/rapidxlsx/actions/workflows/CI.yml/badge.svg)](https://github.com/aminfathullah/rapidxlsx/actions/workflows/CI.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 High-performance Excel (`.xlsx`) spreadsheet writer for Python and R, powered by a multi-threaded Rust engine with parallel OpenXML row formatting and parallel block Deflate compression.
 
 Writes 1,000,000 rows across 20 to 30 columns in under 1 second.
@@ -46,6 +53,8 @@ rapidxlsx/
 ## Python Package
 
 ### Installation
+
+Install the stable release from [PyPI](https://pypi.org/project/rapidxlsx/):
 
 ```bash
 pip install rapidxlsx
@@ -136,38 +145,29 @@ with rapidxlsx.RapidXlsxWriter("report.xlsx", sheet_name="Data") as writer:
 
 ### Installation
 
-#### Option 1: Pre-compiled Binaries (Recommended, No Rust or C toolchain required)
+#### From CRAN (Recommended)
 
-Install pre-compiled platform binaries directly from GitHub Releases:
+Install the stable release directly from [CRAN](https://cran.r-project.org/package=rapidxlsx):
 
 ```r
-# Windows (.zip)
-install.packages("https://github.com/aminfathullah/rapidxlsx/releases/download/v0.1.0/rapidxlsx_0.1.0.zip", repos = NULL)
-
-# macOS (.tgz)
-install.packages("https://github.com/aminfathullah/rapidxlsx/releases/download/v0.1.0/rapidxlsx_0.1.0.tgz", repos = NULL)
-
-# Linux (.tar.gz)
-install.packages("https://github.com/aminfathullah/rapidxlsx/releases/download/v0.1.0/rapidxlsx_0.1.0_linux.tar.gz", repos = NULL)
-
-# Or via remotes / devtools:
-remotes::install_url("https://github.com/aminfathullah/rapidxlsx/releases/download/v0.1.0/rapidxlsx_0.1.0.zip")
+install.packages("rapidxlsx")
 ```
 
-#### Option 2: R-universe (Automatic Cloud Binaries)
+Binary packages are built and distributed by CRAN for Windows and macOS. On Linux, the package compiles against its self-contained vendored Rust engine.
+
+#### Development Version
+
+Install the latest development version from GitHub:
 
 ```r
-install.packages("rapidxlsx", repos = c("https://aminfathullah.r-universe.dev", "https://cloud.r-project.org"))
-```
+# Using pak:
+pak::pkg_install("aminfathullah/rapidxlsx/r")
 
-#### Option 3: Install from Source (Requires Rust/Cargo toolchain)
-
-```r
-# From GitHub using remotes / devtools
+# Or via remotes:
 remotes::install_github("aminfathullah/rapidxlsx/r")
 ```
 
-Or from local source directory:
+To build and install from local source:
 
 ```bash
 R CMD INSTALL r

@@ -16,6 +16,21 @@ knitr::opts_chunk$set(
 
 The `rapidxlsx` package provides high-throughput serialization of R data frames to Microsoft Excel (`.xlsx`) workbooks. It utilizes a multi-threaded Rust engine with zero-copy SEXP vector ingestion and parallel Deflate block compression (`Z_SYNC_FLUSH`).
 
+## Installation
+
+Install the stable release from CRAN:
+
+```{r, eval = FALSE}
+install.packages("rapidxlsx")
+```
+
+Or install the development version from GitHub:
+
+```{r, eval = FALSE}
+# install.packages("pak")
+pak::pkg_install("aminfathullah/rapidxlsx/r")
+```
+
 ## Basic Usage
 
 The primary function is `write_xlsx()`. It takes a `data.frame` and an output file path:

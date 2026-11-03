@@ -13,6 +13,14 @@ authors = [
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "License :: OSI Approved :: MIT License",
@@ -20,9 +28,22 @@ classifiers = [
     "Topic :: Software Development :: Build Tools",
 ]
 dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/aminfathullah/rapidxlsx"
+Documentation = "https://github.com/aminfathullah/rapidxlsx#readme"
+Repository = "https://github.com/aminfathullah/rapidxlsx"
+Issues = "https://github.com/aminfathullah/rapidxlsx/issues"
+"CRAN (R)" = "https://cran.r-project.org/package=rapidxlsx"
+
 [project.optional-dependencies]
 tests = [
     "pytest",
+    "polars",
+    "pandas",
+    "pyarrow",
+    "openpyxl",
+    "fastexcel",
 ]
 [tool.maturin]
 python-source = "python"
